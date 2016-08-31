@@ -1,6 +1,9 @@
 package com.tranings.jdbc.test;
 
+import java.util.ArrayList;
+
 import com.trainings.jdbc.database.DBConnection;
+import com.trainings.jdbc.tables.Film;
 import com.trainings.jdbc.utils.FetchDataFromFile;
 
 public class Test {
@@ -9,9 +12,11 @@ public class Test {
 		// TODO Auto-generated method stub
 		DBConnection db = new DBConnection();
 		db.getURL();
-		db.getConnection();
-		FetchDataFromFile f = new FetchDataFromFile();
-		f.getData();
+		
+		FetchDataFromFile f = new FetchDataFromFile(DBConnection.getConnection());
+		ArrayList<Film> films= f.getFilmData();
+		//f.createFilmTable(films);
+
 	}
 
 }
