@@ -10,38 +10,53 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBConnection {
-	static Properties configProp = new Properties();
-	static InputStream inputConfig= null;
-	private static String URL= null;
-	private static String username = null;
-	private static String password= null;
+	private Properties configurations = new Properties();
+	
 	static Connection conn = null;
 
-	public void getURL(){
-		try {
-			inputConfig = new FileInputStream(".\\config\\config.properties");
-			configProp.load(inputConfig);
-			URL= "jdbc:"+configProp.getProperty("DRIVER")+"://"+configProp.getProperty("SERVER")+":"+configProp.getProperty("PORT")+"/"+configProp.getProperty("DATABASENAME");
-			System.out.println(URL);
+	private static DBConnection dbCon = new DBConnection();
 
-		} catch (FileNotFoundException e) {
+	private Properties loadProperties(){
+		Properties configurations = new Properties();
+		try{
+			InputStream is = new FileInputStream(".\\config\\config.properties");
+			configurations.load(is);
+		}catch(IOException e){
 			e.printStackTrace();
-		}catch (IOException ie) {
-			ie.printStackTrace();
 		}
+		return configurations;
+	}
+	private DBConnection(){
+		configurations = loadProperties();
+	}
+
+	public String getURL(){
+		String URL= "jdbc:"+configurations.getProperty("DRIVER")+"://"+configurations.getProperty("SERVER")+":"+configurations.getProperty("PORT")+"/"+configurations.getProperty("DATABASENAME");
+		System.out.println(URL);
+		return URL;
 
 	}
-	public static Connection getConnection(){
-		username = configProp.getProperty("USERNAME");
-		password = configProp.getProperty("PASSWORD");
-		System.out.println(username+password);
+	public Connection getConnection(){
 
+		String username = configurations.getProperty("USERNAME");
+		String password = configurations.getProperty("PASSWORD");
+		
 		try {
-			conn = DriverManager.getConnection(URL, username, password);
+			if(this.conn == null)
+				conn = DriverManager.getConnection(getURL(), username, password);
+			else
+				return this.conn;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return conn;
+	}
+
+	public static DBConnection getInstance(){
+		if(dbCon == null)
+			dbCon = new DBConnection();
+
+		return dbCon;
 	}
 
 
