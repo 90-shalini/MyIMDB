@@ -11,13 +11,26 @@ import com.trainings.jdbc.tables.Film;
 
 public class QueryHandler {
 	
-	public static List<Film> getDataFromTable(String tableName, String col, String subString, Connection con){
+	public static List<Film> getDataFromTable(String tableName, String condition, String subString, Connection con){
 
 		List<Film> result = new ArrayList<Film>();
 
-		String query = "SELECT * from "+tableName+" WHERE "+col+" like '%"+subString+"%';";
+		String query = "SELECT film.id,yearOfRelease,duration,title,genre.subject AS genre,"
+		+"CONCAT(actor.firstName,',',actor.lastName) AS actorName,"
+		+"CONCAT(actress.firstName,',',actress.lastName) AS actressName,"
+		+"CONCAT(director.firstName,',',director.lastName) AS directorName,"
+		+"popularity,awards,"
+		+"image.name AS image"
+		+" FROM film,genre,actor,actress,director,image"
+		+" WHERE film.genre_id=genre.id"
+		+" AND film.actor_id = actor.id"
+		+" AND film.actress_id=actress.id"
+		+" AND film.director_id=director.id"
+		+" AND film.image_id=image.id"
+		+" "+condition + subString;
+		
 		System.out.println(query);
-
+		
 		ResultSet rs = null;
 		try{
 			Statement stmt = con.createStatement();
@@ -29,6 +42,13 @@ public class QueryHandler {
 				film.setLength(rs.getInt("duration"));
 				film.setPopularity(rs.getInt("popularity"));
 				film.setYearOfRelease(rs.getInt("yearOfRelease"));
+				
+				film.setGenre(rs.getString("genre"));
+				film.setActor(rs.getString("actorName"));
+				film.setActress(rs.getString("actressName"));
+				film.setDirector(rs.getString("directorName"));
+				film.setAwards(rs.getString("awards").charAt(0));
+				film.setImage(rs.getString("image"));
 				
 				result.add(film);
 			}

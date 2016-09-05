@@ -43,7 +43,7 @@ public class HomePage extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
+        setTitle("My IMDB");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -63,7 +63,7 @@ public class HomePage extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Title", "Relase", "Duration", "Popularity Score"
+                "Title", "Relase", "Duration", "Popularity Score", "Genre", "Actor", "Actress", "Director", "Awards", "Image"
             }
         ));
         jScrollPane1.setViewportView(result);
@@ -89,11 +89,10 @@ public class HomePage extends javax.swing.JFrame {
                         .addGap(77, 77, 77))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1)
-                        .addContainerGap())))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addComponent(jButton2)
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton2)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -102,11 +101,11 @@ public class HomePage extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
-                .addGap(59, 59, 59)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(196, Short.MAX_VALUE))
+                .addContainerGap(256, Short.MAX_VALUE))
         );
 
         pack();
@@ -118,30 +117,39 @@ public class HomePage extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
         
-   List<Film> results = QueryHandler.getDataFromTable("film", "title", jTextField1.getText(), con);
-		if(results.size() == 0){
-			
-		}
-        for(int i=0; i<results.size(); i++){
-        	Object[] row = { results.get(i).getTitle(), results.get(i).getYearOfRelease(), results.get(i).getLength(), results.get(i).getPopularity() };
-        	DefaultTableModel model = (DefaultTableModel) result.getModel();
-        	model.addRow(row);
-        }
+    	cleanResultTable();
+
+    	List<Film> results = QueryHandler.getDataFromTable("film", "AND title like '%", jTextField1.getText()+"%'", con);
+    	if(results.size() == 0){
+    		//result.disable();
+    	}
+    	for(int i=0; i<results.size(); i++){
+    		Object[] row = { results.get(i).getTitle(), results.get(i).getYearOfRelease(), results.get(i).getLength(), results.get(i).getPopularity(),results.get(i).getGenre(),results.get(i).getActor(),results.get(i).getActress(),results.get(i).getDirector(),results.get(i).getAwards(),results.get(i).getImage() };
+    		DefaultTableModel model = (DefaultTableModel) result.getModel();
+    		model.addRow(row);
+    	}
     }                                        
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-    	List<Film> results = QueryHandler.getTopNMovies("film", "popularity", 25, con);
-		if(results.size() == 0){
-			
-		}
-        for(int i=0; i<results.size(); i++){
-        	Object[] row = { results.get(i).getTitle(), results.get(i).getYearOfRelease(), results.get(i).getLength(), results.get(i).getPopularity() };
-        	DefaultTableModel model = (DefaultTableModel) result.getModel();
-        	model.addRow(row);
-        }
-    
+    	cleanResultTable();
+    	List<Film> results = QueryHandler.getDataFromTable("film", "order by popularity desc limit 25", "", con);
+    	if(results.size() == 0){
+    		//result.disable();
+    	}
+    	for(int i=0; i<results.size(); i++){
+    		Object[] row = { results.get(i).getTitle(), results.get(i).getYearOfRelease(), results.get(i).getLength(), results.get(i).getPopularity(),results.get(i).getGenre(),results.get(i).getActor(),results.get(i).getActress(),results.get(i).getDirector(),results.get(i).getAwards(),results.get(i).getImage() };
+    		DefaultTableModel model = (DefaultTableModel) result.getModel();
+    		model.addRow(row);
+    	}
+    	
     }                                        
 
+    private void cleanResultTable(){
+    	DefaultTableModel model = (DefaultTableModel)result.getModel(); 
+    	int rows = model.getRowCount(); 
+    	for(int i = rows - 1; i >=0; i--)
+    	   model.removeRow(i); 
+    }
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton jButton1;
