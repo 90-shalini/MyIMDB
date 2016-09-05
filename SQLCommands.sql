@@ -1,9 +1,23 @@
+select yearOfRelease,duration,title,subject from film,genre where film.id=3 and genre.id in (select genre_id from film where id=3);
+ 
+
 truncate table actor;
 truncate table actress;
 truncate table director;
 truncate table genre;
 truncate table image;
+truncate table film;
 
+
+CREATE TABLE animals (
+     id MEDIUMINT NOT NULL AUTO_INCREMENT,
+     name CHAR(30) NOT NULL,
+     PRIMARY KEY (id)
+);
+
+INSERT INTO animals (name) VALUES
+    ('dog'),('cat'),('penguin'),
+    ('lax'),('whale'),('ostrich');
 
 create table image(
 id int NOT NULL AUTO_INCREMENT,
@@ -26,3 +40,7 @@ popularity int,
 awards enum('Y','N'),
 image_id INT,FOREIGN KEY(image_id) REFERENCES image(id)
 )
+
+insert into genre (id,subject) values('1000','Comedy1');
+
+ALTER TABLE genre AUTO_INCREMENT=1;
